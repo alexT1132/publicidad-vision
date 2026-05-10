@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 
 type ChatMessage = { role: "user" | "assistant"; content: string; time: string };
@@ -210,18 +211,19 @@ function ChatBot() {
     setLoading(true);
 
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
           system: CHAT_SYSTEM_PROMPT,
           messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
         }),
       });
-      const data = await response.json();
-      const assistantText = data.content?.find((b: any) => b.type === "text")?.text ?? "Lo siento, no pude procesar tu pregunta. Intenta de nuevo.";
+      const data = (await response.json()) as { content?: string; error?: string };
+      if (!response.ok) {
+        throw new Error(data.error ?? "No se pudo completar la solicitud.");
+      }
+      const assistantText = data.content ?? "Lo siento, no pude procesar tu pregunta. Intenta de nuevo.";
       setMessages(prev => [
         ...prev,
         {
@@ -230,12 +232,16 @@ function ChatBot() {
           time: new Date().toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" }),
         },
       ]);
-    } catch {
+    } catch (error) {
+      const fallback =
+        error instanceof Error && error.message
+          ? error.message
+          : "Hubo un error de conexión. Por favor intenta de nuevo en un momento.";
       setMessages(prev => [
         ...prev,
         {
           role: "assistant",
-          content: "Hubo un error de conexión. Por favor intenta de nuevo en un momento.",
+          content: fallback,
           time: new Date().toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" }),
         },
       ]);
@@ -396,9 +402,12 @@ export default function Home() {
       {/* ══════════════ HERO ══════════════ */}
       <section className="relative w-full flex flex-col bg-[#020617] overflow-hidden">
         <div className="relative w-full h-[65vh] md:h-[80vh]">
-          <img
+          <Image
             src="/images/hero-publicidad-vision.jpg"
             alt="Publicidad con Visión — Ecosistema Holográfico 3D"
+            fill
+            priority
+            sizes="100vw"
             className="w-full h-full object-cover object-center"
             style={{ filter: "saturate(1.2) brightness(1.05) contrast(1.02)" }}
           />
@@ -454,10 +463,15 @@ export default function Home() {
             <div key={i} className="bg-slate-900/40 border border-slate-800 rounded-3xl overflow-hidden hover:border-sky-500/30 transition-all duration-300 group flex flex-col">
               <div className="w-full bg-slate-950 relative overflow-hidden border-b border-slate-800">
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent z-10 pointer-events-none"/>
-                <img src={item.img} alt={item.titulo}
+                <Image
+                  src={item.img}
+                  alt={item.titulo}
+                  width={1200}
+                  height={720}
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="w-full h-auto max-h-72 object-contain object-center group-hover:scale-[1.03] transition-transform duration-700 bg-slate-950"
                   onError={e => {
-                    const el = e.target as HTMLImageElement;
+                    const el = e.currentTarget;
                     el.style.display = "none";
                     const parent = el.parentElement;
                     if (parent && !parent.querySelector(".img-fallback")) {

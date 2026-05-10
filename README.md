@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Publicidad con Vision
 
-## Getting Started
+Landing en Next.js 16 para el sitio de Publicidad con Vision.
 
-First, run the development server:
+## Desarrollo local
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deploy con Docker Compose
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Este proyecto ya esta preparado para correr en produccion con `Next.js standalone`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Primera vez en el servidor:
 
-## Learn More
+```bash
+git clone <TU-REPO> publicidad-con-vision
+cd publicidad-con-vision
+cp .env.example .env
+# edita .env y coloca tu ANTHROPIC_API_KEY real
+sudo docker compose up -d
+```
 
-To learn more about Next.js, take a look at the following resources:
+Actualizacion normal:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+git pull
+sudo docker compose down
+sudo docker compose up -d
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`docker-compose.yml` usa `pull_policy: build` para que `docker compose up` reconstruya la imagen con el codigo recien actualizado. Si tu servidor tiene una version vieja de Docker Compose y no respeta esa opcion, usa:
 
-## Deploy on Vercel
+```bash
+sudo docker compose up -d --build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+La app queda expuesta en el puerto `3000`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Variables de entorno esperadas en `.env`:
+
+```bash
+ANTHROPIC_API_KEY=tu_api_key_real
+ANTHROPIC_MODEL=claude-sonnet-4-20250514
+```
+
+## Pasar el repo a tu GitHub
+
+Si quieres que este proyecto apunte a un repositorio tuyo en vez del original:
+
+1. Crea un repositorio nuevo y vacio en tu cuenta de GitHub.
+2. Cambia el remoto local:
+
+```bash
+git remote rename origin upstream
+git remote add origin https://github.com/TU_USUARIO/TU_REPO.git
+git remote -v
+```
+
+3. Sube la rama actual:
+
+```bash
+git push -u origin master
+```
+
+Asi conservas el repo original como `upstream` y tu repo nuevo como `origin`.
