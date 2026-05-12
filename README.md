@@ -46,6 +46,17 @@ ANTHROPIC_API_KEY=tu_api_key_real
 ANTHROPIC_MODEL=claude-sonnet-4-20250514
 ```
 
+## Nginx
+
+Agregue una configuracion base en [deploy/nginx/publicidad-con-vision.conf](/Users/alextellezvazquez/Documents/proyectos/Publicidad-con-visionV1/deploy/nginx/publicidad-con-vision.conf) y una guia en [deploy/nginx/README.md](/Users/alextellezvazquez/Documents/proyectos/Publicidad-con-visionV1/deploy/nginx/README.md).
+
+Puntos importantes para no cruzar dominios con otros proyectos:
+
+- No usar `default_server` en este sitio.
+- No usar `server_name _;`.
+- Poner el dominio exacto en `server_name`.
+- Verificar con `sudo nginx -T | grep -n "server_name"` que no exista otro bloque con el mismo dominio antes de recargar.
+
 ## Pasar el repo a tu GitHub
 
 Si quieres que este proyecto apunte a un repositorio tuyo en vez del original:

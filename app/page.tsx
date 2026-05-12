@@ -680,7 +680,7 @@ export default function Home() {
         </div>
         <ChatBot />
         <p className="text-center text-xs text-slate-600 mt-5 font-mono">
-          Impulsado por Claude · Especializado en el Ecosistema Publicidad con Visión
+          Impulsado por DeepSeek · Especializado en el Ecosistema Publicidad con Visión
         </p>
       </section>
 
